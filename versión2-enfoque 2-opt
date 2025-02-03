@@ -49,16 +49,16 @@ def delta_tsp(filename):
     coords = read_tsp_file(filename)
     num_cities = len(coords)
     
-    # Generate an initial random tour
+    # Genera un tour inicial aleatorio
     initial_tour = generate_initial_tour(num_cities)
     
-    # Apply 2-opt to improve the tour
+    # Aplica el algotimo 2-opt para mejorar el tour aleayotio inical
     optimized_tour = two_opt(initial_tour, coords)
     
     return optimized_tour, total_distance(optimized_tour, coords)
 
 if __name__ == "__main__":
-    filename = "pla8833.tsp"  # Cambia esto al nombre de tu archivo
+    filename = "pla33810.tsp"  
     tour, distance = delta_tsp(filename)
     
     print("Tour optimizado:", tour)
