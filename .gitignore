@@ -1,1 +1,12 @@
+
+# Problemn related stuff
 *.tsp
+
+# Python Stuff
+venv/
+__pycache__/
+
+# C / CPP Stuff
+*.out
+*.so
+*.o
