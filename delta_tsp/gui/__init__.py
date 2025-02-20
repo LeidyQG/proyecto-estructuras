@@ -3,25 +3,25 @@ from tkinter import *
 from tkinter import Misc
 from tkinter import ttk
 
+from tkinterdnd2 import TkinterDnD
+
+from .frame_load import Frame_Load
+
+from .custom_widgets import WindowAppTools
+
 APP_NAME = "CC - Delta TSP Solver"
 
-class GUI ():
+class GUI (WindowAppTools):
     root: Tk = None
     main_frame: ttk.Frame = None
 
-    _screen_width: int = 0
-    _screen_height: int = 0
-    _win_width: int = 0
-    _win_height: int = 0
-
     def __init__ (self, *args, **kwargs):
-        self.root = Tk()
+        self.root = TkinterDnD.Tk()
 
         self.__set_root_style()
 
         self.__set_notebook(self.main_frame)
 
-        self.root.mainloop()
         return
 
     def _get_win_percentage (self, percentage:int=100, use_width:bool=True) -> int:
@@ -46,14 +46,14 @@ class GUI ():
 
         self.main_frame = ttk.Frame(
             self.root,
-            padding=self._get_win_percentage(2),
+            # padding=self._get_win_percentage(2),
             borderwidth=3,
             relief=GROOVE
         )
 
         self.main_frame.pack(
             anchor=CENTER,
-            padx=self._get_win_percentage(2),
+            padx=self._get_win_percentage(8),
             pady=self._get_win_percentage(2),
             fill=BOTH,
             expand=True
@@ -61,18 +61,33 @@ class GUI ():
         return
 
     def __set_notebook (self, parent: Misc) -> None:
-        nbook = ttk.Notebook(parent)
+        nbook = ttk.Notebook(
+            parent,
+            name="main-book"
+        )
 
-        f1 = ttk.Frame(nbook)
-        f2 = ttk.Frame(nbook)
-        f3 = ttk.Frame(nbook)
+        fload = Frame_Load(nbook, self._win_width, self._win_height)
+        fprocess = ttk.Frame(nbook)
+        fresults = ttk.Frame(nbook)
+        fothers = ttk.Frame(nbook)
 
-        nbook.add(f1, text="Load")
-        nbook.add(f2, text="Process")
-        nbook.add(f3, text="Results")
+        nbook.add(
+            fload.root, 
+            text="Load",
+        )
+        nbook.add(fprocess, text="Process")
+        nbook.add(fresults, text="Results")
+        nbook.add(fothers, text="Info")
 
-        ttk.Label(f1, text="Hello World!").pack()
-        ttk.Button(f1, text="Quit", command=self.root.destroy).pack()
+        fload.start()
 
-        nbook.pack()
+        nbook.pack(
+            anchor=CENTER,
+            fill=BOTH,
+            expand=True
+        )
+        return
+
+    def run (self) -> None:
+        self.root.mainloop()
         return
