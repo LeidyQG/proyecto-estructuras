@@ -1,10 +1,16 @@
 
+import pathlib
+
 from tkinter import Frame, Button, Label, LabelFrame, PhotoImage, Misc
 from tkinter import N, NW, NE, E, W, S, X, CENTER, BOTH, NONE, LEFT, RIGHT
+from tkinter.filedialog import askopenfilename
 
 from tkinterdnd2 import DND_FILES, TkinterDnD
 
 from .custom_widgets import WindowAppTools, create_title
+
+from ..app_globals import get_file_loaded, set_file_path, TSP_FILE_TYPE
+from ..file_utils import handle_file_drop
 
 class Frame_Load (WindowAppTools):
     root: Frame = None
@@ -78,7 +84,8 @@ class Frame_Load (WindowAppTools):
         file_input_btn = Button(
             file_label_wrapper,
             text="Find File",
-            compound=LEFT
+            compound=LEFT,
+            command=self.__open_file_dialog
         )
         file_input_btn.image = file_input_btn_img
         file_input_btn.config(image=file_input_btn_img)
@@ -89,7 +96,7 @@ class Frame_Load (WindowAppTools):
         file_label_wrapper.pack(anchor=CENTER, expand=True)
 
         file_wrapper.drop_target_register(DND_FILES)
-        file_wrapper.dnd_bind("<<Drop>>", lambda e: print(e))
+        file_wrapper.dnd_bind("<<Drop>>", handle_file_drop)
         
         file_wrapper.pack(
             padx=self._get_win_percentage(12),
@@ -100,7 +107,7 @@ class Frame_Load (WindowAppTools):
         )
         return
 
-    def __create_footer_section (self, parent: Misc):
+    def __create_footer_section (self, parent: Misc) -> None:
         footer_wrapper = Frame(parent)
         
         download_files_btn_img = self._get_icon("download.png")
@@ -108,8 +115,10 @@ class Frame_Load (WindowAppTools):
             footer_wrapper,
             text="Download TSP Files",
             image=download_files_btn_img,
-            compound=LEFT
-        ) # God I hate Tk
+            compound=LEFT,
+            command=lambda: print(get_file_loaded())
+        )
+        # God I hate Tk
         download_files_btn.image = download_files_btn_img
         download_files_btn.configure(image=download_files_btn_img)
         download_files_btn.pack(
@@ -122,4 +131,23 @@ class Frame_Load (WindowAppTools):
             expand=False,
             fill=X
         )
+        return
+
+    def __open_file_dialog (self) -> None:
+        file_name = askopenfilename(
+            title="Select a TSP Instance File",
+            # initialdir=
+            filetypes=(("TST Instance file", TSP_FILE_TYPE),)
+        )
+
+        if file_name == "":
+            return
+
+        file_path = pathlib.Path(file_name)
+        
+        error = set_file_path(file_path)
+        if error:
+            # TODO: notify or smth
+            pass
+
         return
