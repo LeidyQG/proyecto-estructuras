@@ -1,7 +1,7 @@
 
 import pathlib
 
-from tkinter import Frame, Button, Label, LabelFrame, PhotoImage, Misc
+from tkinter import Frame, Button, Label, LabelFrame, PhotoImage, StringVar, Misc
 from tkinter import N, NW, NE, E, W, S, X, CENTER, BOTH, NONE, LEFT, RIGHT
 from tkinter.filedialog import askopenfilename
 
@@ -9,15 +9,18 @@ from tkinterdnd2 import DND_FILES, TkinterDnD
 
 from .custom_widgets import WindowAppTools, create_title
 
-from ..app_globals import get_file_loaded, set_file_path, TSP_FILE_TYPE
+from ..app_globals import get_file_loaded, get_file_path, set_file_path, TSP_FILE_TYPE
 from ..file_utils import handle_file_drop
 
 class Frame_Load (WindowAppTools):
+    parent: Misc = None
     root: Frame = None
-    main_frame: Frame = None
 
-    def __init__ (self, parent: Misc, win_width: int, win_height: int) -> Frame:
-        self.root = Frame(parent)
+    __input_labels: list[StringVar] = []
+
+    def __init__ (self, parent: Misc, win_width: int, win_height: int):
+        self.parent = parent
+        self.root = Frame(self.parent)
 
         self._win_width = win_width
         self._win_height = win_height
@@ -77,9 +80,14 @@ class Frame_Load (WindowAppTools):
         file_label_wrapper = Frame(file_wrapper)
         
         file_input_btn_img = self._get_icon("find.png")
-        file_input_label = Label(
+        self.set_input_label()
+        file_input_label_1 = Label(
             file_label_wrapper,
-            text="Drag and Drop Your TSP instance File Here \nor",
+            textvariable=self.__input_labels[0]
+        )
+        file_input_label_2 = Label(
+            file_label_wrapper,
+            textvariable=self.__input_labels[1]
         )
         file_input_btn = Button(
             file_label_wrapper,
@@ -90,13 +98,14 @@ class Frame_Load (WindowAppTools):
         file_input_btn.image = file_input_btn_img
         file_input_btn.config(image=file_input_btn_img)
 
-        file_input_label.pack()
+        file_input_label_1.pack()
+        file_input_label_2.pack()
         file_input_btn.pack()
 
         file_label_wrapper.pack(anchor=CENTER, expand=True)
 
         file_wrapper.drop_target_register(DND_FILES)
-        file_wrapper.dnd_bind("<<Drop>>", handle_file_drop)
+        file_wrapper.dnd_bind("<<Drop>>", lambda e: handle_file_drop(e, self.parent))
         
         file_wrapper.pack(
             padx=self._get_win_percentage(12),
@@ -145,9 +154,24 @@ class Frame_Load (WindowAppTools):
 
         file_path = pathlib.Path(file_name)
         
-        error = set_file_path(file_path)
+        error = set_file_path(file_path, self.parent)
         if error:
             # TODO: notify or smth
             pass
+
+        return
+
+    def set_input_label (self, loaded:bool=False) -> None:
+        if len(self.__input_labels) == 0:
+            self.__input_labels.append(StringVar(self.root, "Drag and Drop Your TSP instance File Here \nor"))
+            self.__input_labels.append(StringVar(self.root, ""))
+
+        if loaded:
+            file_loaded_name = get_file_path().stem + get_file_path().suffix
+            self.__input_labels[0].set(f"Loaded '{file_loaded_name}'")
+            self.__input_labels[1].set("need to use other file? Drag and Drop the file or")
+        else:
+            self.__input_labels[0].set("Drag and Drop Your TSP instance File Here \nor")
+            self.__input_labels[1].set("")
 
         return
