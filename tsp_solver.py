@@ -9,7 +9,8 @@ lib = ctypes.CDLL('./distance_calculator.so')
 lib.calculate_distance_matrix.argtypes = (
     ctypes.POINTER(ctypes.c_double),  # cities
     ctypes.c_int,                     # num_cities
-    ctypes.POINTER(ctypes.c_double)   # distance_matrix
+    ctypes.POINTER(ctypes.c_double),  # distance_matrix
+    ctypes.c_int                      # num_threads
 )
 
 def read_tsp_file(file_path):
@@ -31,7 +32,7 @@ def read_tsp_file(file_path):
     
     return np.array(cities, dtype=np.float64)
 
-def calculate_distance_matrix_parallel(cities):
+def calculate_distance_matrix_parallel(cities, num_threads=4):
     num_cities = len(cities)
     distance_matrix = np.zeros((num_cities, num_cities), dtype=np.float64)
     
@@ -40,7 +41,7 @@ def calculate_distance_matrix_parallel(cities):
     distance_matrix_c = distance_matrix.ctypes.data_as(ctypes.POINTER(ctypes.c_double))
     
     # Llamar a la función de C++ para calcular la matriz de distancias
-    lib.calculate_distance_matrix(cities_c, num_cities, distance_matrix_c)
+    lib.calculate_distance_matrix(cities_c, num_cities, distance_matrix_c, num_threads)
     
     return distance_matrix
 
@@ -79,7 +80,7 @@ def load_distance_matrix_from_disk(file_path):
     with open(file_path, 'rb') as f:
         return np.load(f)
 
-def main(file_path):
+def main(file_path, num_threads=4):
     cities = read_tsp_file(file_path)
     print(f"Number of cities: {len(cities)}")
     
@@ -87,7 +88,7 @@ def main(file_path):
     distance_matrix_path = "distance_matrix.npy"
     if not os.path.exists(distance_matrix_path):
         print("Calculating distance matrix...")
-        distance_matrix = calculate_distance_matrix_parallel(cities)
+        distance_matrix = calculate_distance_matrix_parallel(cities, num_threads)
         save_distance_matrix_to_disk(distance_matrix, distance_matrix_path)
     else:
         print("Loading distance matrix from disk...")
@@ -102,5 +103,6 @@ def main(file_path):
     print(f"Total Distance: {total_distance}")
 
 if __name__ == "__main__":
-    file_path = "ruta_al_archivo.tsp"  # Cambia esto por la ruta de tu archivo .tsp
-    main(file_path)
+    file_path = "pla33810.tsp"  # Cambia esto por la ruta de tu archivo .tsp
+    num_threads = 8  # Número de hilos a usar
+    main(file_path, num_threads)
