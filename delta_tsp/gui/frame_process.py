@@ -1,27 +1,85 @@
 
 from tkinter import Frame, LabelFrame, Button, Text, Event, Misc
-from tkinter import N, NW, NE, E, W, S, X, CENTER, BOTH, NONE, TOP, LEFT, RIGHT, END, NORMAL, DISABLED
+from tkinter import N, NW, NE, E, W, S, X, Y, CENTER, BOTH, NONE, TOP, LEFT, RIGHT, END, NORMAL, DISABLED
 
-from .custom_widgets import WindowAppTools, create_title
+from .custom_widgets import WindowAppTools, create_title, create_algorithm_btn
 
 from ..app_globals import get_file_loaded, get_file_previewed, get_file_path, set_file_previewed
 from ..file_utils import load_file_contents_buffer
 
+MAX_ALGORITHMS_BTNS_PER_ROW = 5
 ALGORITHMS_LIST: list[dict[str, any]] = [
     {
+        "uid": 0,
         "name": "Algorithm 1",
-        "execution": lambda: print("algorithm_1"),
-        "icon": ""
+        "command": lambda: print("algorithm_1"),
+        "icon": "",
+        "fg": "",
+        "bg": ""
     },
     {
+        "uid": 0,
+        "name": "Algorithm 1",
+        "command": lambda: print("algorithm_1"),
+        "icon": "",
+        "fg": "",
+        "bg": ""
+    },
+    {
+        "uid": 0,
+        "name": "Algorithm 1",
+        "command": lambda: print("algorithm_1"),
+        "icon": "",
+        "fg": "",
+        "bg": ""
+    },
+    {
+        "uid": 0,
+        "name": "Algorithm 1",
+        "command": lambda: print("algorithm_1"),
+        "icon": "",
+        "fg": "",
+        "bg": ""
+    },
+    {
+        "uid": 0,
+        "name": "Algorithm 1",
+        "command": lambda: print("algorithm_1"),
+        "icon": "",
+        "fg": "",
+        "bg": ""
+    },
+    {
+        "uid": 1,
         "name": "Algorithm 2",
-        "execution": lambda: print("algorithm_2"),
-        "icon": ""
+        "command": lambda: print("algorithm_2"),
+        "icon": "",
+        "fg": "",
+        "bg": ""
     },
     {
+        "uid": 1,
+        "name": "Algorithm 2",
+        "command": lambda: print("algorithm_2"),
+        "icon": "",
+        "fg": "",
+        "bg": ""
+    },
+    {
+        "uid": 1,
+        "name": "Algorithm 2",
+        "command": lambda: print("algorithm_2"),
+        "icon": "",
+        "fg": "",
+        "bg": ""
+    },
+    {
+        "uid": 2,
         "name": "Algorithm 3",
-        "execution": lambda: print("algorithm_3"),
-        "icon": ""
+        "command": lambda: print("algorithm_3"),
+        "icon": "",
+        "fg": "",
+        "bg": ""
     },
 ]
 
@@ -90,7 +148,7 @@ class Frame_Process (WindowAppTools):
         self.root.bind("<Visibility>", self.__load_file)
         self.preview_text = Text(
             preview_wrapper,
-            height=self._get_win_percentage(48, use_width=False) // 16,
+            height=self._get_win_percentage(40, use_width=False) // 16,
             state=DISABLED
         )
 
@@ -103,7 +161,7 @@ class Frame_Process (WindowAppTools):
             padx=self._get_win_percentage(12),
             pady=self._get_win_percentage(1),
             anchor=CENTER,
-            expand=True,
+            expand=False,
             fill=BOTH
         )
 
@@ -111,31 +169,41 @@ class Frame_Process (WindowAppTools):
 
     def __create_footer_section (self, parent: Misc) -> None:
         footer_wrapper = Frame(parent)
+        btn_row = Frame(footer_wrapper)
         
-        for algorithm in ALGORITHMS_LIST:
-            algorithm_btn = Button(
-                footer_wrapper,
-                text=algorithm["name"],
-                command=algorithm["execution"]
+        for i, algorithm in enumerate(ALGORITHMS_LIST):
+            if i % MAX_ALGORITHMS_BTNS_PER_ROW == 0 and i != 0:
+                btn_row.pack(side=TOP, pady=self._get_win_percentage(1, use_width=False))
+                btn_row = Frame(footer_wrapper)
+
+            algorithm_btn = create_algorithm_btn(
+                btn_row,
+                algorithm["uid"],
+                algorithm["name"],
+                algorithm["command"],
+                # icon=algorithm["icon"],
+                # fgcolor=algorithm["fg"],
+                # bgcolor=algorithm["bg"],
+
             )
             algorithm_btn.pack(
                 side=LEFT,
                 padx=self._get_win_percentage(1)
             )
 
+        btn_row.pack(side=TOP)
         footer_wrapper.pack(
             anchor=S,
-            expand=False,
+            expand=True,
+            fill=Y
         )
         return
 
     def __load_file (self, event: Event) -> None:
-        print("try")
         if get_file_previewed() or \
            not get_file_loaded() or\
            get_file_path() == None:
             return
-        print("done")
 
         current_file_content = load_file_contents_buffer(get_file_path())
         self.preview_text.config(state=NORMAL)

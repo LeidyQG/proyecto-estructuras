@@ -1,7 +1,7 @@
 
 import pathlib
 
-from tkinter import Label, PhotoImage, font, Misc
+from tkinter import Frame, Label, Button, PhotoImage, Misc
 from tkinter import LEFT
 
 class WindowAppTools ():
@@ -48,3 +48,52 @@ def create_title (parent: Misc, text: str) -> Label:
     )
 
     return title_label
+
+def create_algorithm_btn (
+        parent: Misc, 
+        uid:int, 
+        text: str, 
+        command: callable, 
+        icon:str="", 
+        fgcolor:str="#000011", 
+        bgcolor:str="#001100"
+    ) -> Button:
+    btn_wrapper = Frame(parent)
+
+    btn: Button = None
+    
+    if not icon:
+        btn = Button(
+            btn_wrapper,
+            text=text,
+            command=command
+        )
+    else:
+        btn_img = PhotoImage(
+            file=str(pathlib.Path().resolve()) + "/resources/icons/" + icon,
+            width=16,
+            height=16
+        )
+        btn = Button(
+            btn_wrapper,
+            image=help_btn_img
+        )
+        btn.image = btn_img
+        btn.config(image=btn_img)
+    
+    info_btn_img = PhotoImage(
+        file=str(pathlib.Path().resolve()) + "/resources/icons/help-about-mid.png",
+        width=24,
+        height=24
+    )
+    info_btn = Button(
+        btn_wrapper,
+        image=info_btn_img
+    )
+    info_btn.image = info_btn_img
+    info_btn.config(image=info_btn_img)
+
+    btn.pack(side=LEFT)
+    info_btn.pack(side=LEFT)
+
+    return btn_wrapper
