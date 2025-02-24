@@ -91,7 +91,7 @@ python gui.py
 3. **Ver Resultados**:
    - Después de procesar el archivo, los resultados se mostrarán en la pestaña "Results".
 ----------------------------------------------------------------FIN--------README---------GUI-------------------
-     -------------------------------------README-----------ALGORITMOS-------------------------
+-------------------------------------README-----------ALGORITMOS------------------------------------------------
 # README: Implementaciones de Algoritmos para el Problema del Viajante de Comercio (TSP)
 
 Este repositorio contiene cinco implementaciones de algoritmos para resolver el Problema del Viajante de Comercio (TSP). Cada algoritmo tiene su propio enfoque y características, lo que permite comparar su rendimiento y resultados. A continuación, se describe cada uno de los algoritmos y su funcionamiento.
