@@ -1,5 +1,5 @@
 # README: CC - Delta TSP Solver
-------------------------README -----------------GUI--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------  
+------------------------README -----------------GUI------------------------------------------------------------------------------------  
 ## Descripción General
 
 El CC - Delta TSP Solver es una aplicación gráfica diseñada para resolver instancias del problema del Viajante de Comercio (TSP, por sus siglas en inglés). La aplicación está construida utilizando la biblioteca `tkinter` de Python, con extensiones de `tkinterdnd2` para soportar la funcionalidad de arrastrar y soltar archivos. La interfaz gráfica está organizada en varias secciones que permiten al usuario cargar archivos de instancias TSP, procesarlos utilizando diferentes algoritmos y visualizar los resultados.
