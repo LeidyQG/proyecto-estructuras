@@ -10,8 +10,6 @@ El proyecto está organizado en varios módulos y archivos que gestionan diferen
 
 ## Instalación y Ejecución
 
-# Proyecto de Análisis de Redes y Optimización
-
 Este proyecto utiliza bibliotecas de Python para el análisis de redes, optimización y visualización.
 
 ## Requisitos
