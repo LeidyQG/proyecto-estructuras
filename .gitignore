@@ -1,6 +1,7 @@
 
 # Problemn related stuff
 *.tsp
+*.tour
 
 # Python Stuff
 venv/
