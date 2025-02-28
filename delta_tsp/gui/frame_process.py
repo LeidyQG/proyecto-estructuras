@@ -1,95 +1,29 @@
 
-from tkinter import Frame, LabelFrame, Button, Text, Event, Misc
+import threading
+
+from tkinter import Frame, LabelFrame, Label, Button, Text, Event, Tk, Misc
 from tkinter import N, NW, NE, E, W, S, X, Y, CENTER, BOTH, NONE, TOP, LEFT, RIGHT, END, NORMAL, DISABLED
 
 from .custom_widgets import WindowAppTools, create_title, create_algorithm_btn
 
-from ..app_globals import get_file_loaded, get_file_previewed, get_file_path, set_file_previewed
+from ..algorithms import ALGORITHMS_LIST
+from ..algorithms.thread_test import test_time
+
+from ..app_globals import get_file_loaded, get_file_previewed, get_file_processing, get_file_path, set_file_previewed, set_file_processing
 from ..file_utils import load_file_contents_buffer
 
 MAX_ALGORITHMS_BTNS_PER_ROW = 5
-ALGORITHMS_LIST: list[dict[str, any]] = [
-    {
-        "uid": 0,
-        "name": "Algorithm 1",
-        "command": lambda: print("algorithm_1"),
-        "icon": "",
-        "fg": "",
-        "bg": ""
-    },
-    {
-        "uid": 0,
-        "name": "Algorithm 1",
-        "command": lambda: print("algorithm_1"),
-        "icon": "",
-        "fg": "",
-        "bg": ""
-    },
-    {
-        "uid": 0,
-        "name": "Algorithm 1",
-        "command": lambda: print("algorithm_1"),
-        "icon": "",
-        "fg": "",
-        "bg": ""
-    },
-    {
-        "uid": 0,
-        "name": "Algorithm 1",
-        "command": lambda: print("algorithm_1"),
-        "icon": "",
-        "fg": "",
-        "bg": ""
-    },
-    {
-        "uid": 0,
-        "name": "Algorithm 1",
-        "command": lambda: print("algorithm_1"),
-        "icon": "",
-        "fg": "",
-        "bg": ""
-    },
-    {
-        "uid": 1,
-        "name": "Algorithm 2",
-        "command": lambda: print("algorithm_2"),
-        "icon": "",
-        "fg": "",
-        "bg": ""
-    },
-    {
-        "uid": 1,
-        "name": "Algorithm 2",
-        "command": lambda: print("algorithm_2"),
-        "icon": "",
-        "fg": "",
-        "bg": ""
-    },
-    {
-        "uid": 1,
-        "name": "Algorithm 2",
-        "command": lambda: print("algorithm_2"),
-        "icon": "",
-        "fg": "",
-        "bg": ""
-    },
-    {
-        "uid": 2,
-        "name": "Algorithm 3",
-        "command": lambda: print("algorithm_3"),
-        "icon": "",
-        "fg": "",
-        "bg": ""
-    },
-]
 
 class Frame_Process (WindowAppTools):
+    __app_root: Tk = None
     root: Frame = None
     parent: Misc = None
 
     preview_text: Text = None
+    loading_frame: Frame = None
 
-    def __init__ (self, parent: Misc, win_width: int, win_height: int):
+    def __init__ (self, app_root: Tk, parent: Misc, win_width: int, win_height: int):
+        self.__app_root = app_root
         self.parent = parent
         self.root = Frame(parent)
 
@@ -127,7 +61,7 @@ class Frame_Process (WindowAppTools):
         help_btn_img = self._get_icon("help-about.png", big=True)
         help_btn = Button(
             header_wrapper,
-            image=help_btn_img
+            image=help_btn_img,
         )
         help_btn.image = help_btn_img
         help_btn.config(image=help_btn_img)
@@ -180,7 +114,7 @@ class Frame_Process (WindowAppTools):
                 btn_row,
                 algorithm["uid"],
                 algorithm["name"],
-                algorithm["command"],
+                lambda uid: self.__load_algorithm(uid),
                 # icon=algorithm["icon"],
                 # fgcolor=algorithm["fg"],
                 # bgcolor=algorithm["bg"],
@@ -204,11 +138,26 @@ class Frame_Process (WindowAppTools):
            not get_file_loaded() or\
            get_file_path() == None:
             return
-
+    
         current_file_content = load_file_contents_buffer(get_file_path())
         self.preview_text.config(state=NORMAL)
+        self.preview_text.delete("1.0", END)
         self.preview_text.insert(END, current_file_content)
         self.preview_text.config(state=DISABLED)
         set_file_previewed(True)
+        return
+
+    def __load_algorithm (self, algorithm_uid: int) -> None:
+        if get_file_processing():
+            # TODO: alert, processing in time
+            return
+
+        set_file_processing(True, self.parent)
+
+        algorithm_data = ALGORITHMS_LIST[algorithm_uid]
+        print(algorithm_data)
+        
+        process_thread = threading.Thread(target=test_time, args=[self.parent])
+        process_thread.start()
         return
 

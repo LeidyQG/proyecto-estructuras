@@ -1,0 +1,7 @@
+{
+    "title":"Algoritmo 2-opt",
+    "info":"El algoritmo 2-opt es una técnica de optimización local que mejora una solución inicial (por ejemplo, un tour aleatorio) intercambiando pares de aristas para reducir la distancia total del recorrido.",
+    "complexity":"O(n^2) por iteración",
+    "memory":"Baja",
+    "quality":"Depende de la solución inicial"
+}

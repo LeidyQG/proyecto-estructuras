@@ -1,7 +1,7 @@
 
 import pathlib
 
-from tkinter import Frame, Button, Label, LabelFrame, PhotoImage, StringVar, Misc
+from tkinter import Frame, Button, Label, LabelFrame, PhotoImage, StringVar, Tk, Misc
 from tkinter import N, NW, NE, E, W, S, X, CENTER, BOTH, NONE, LEFT, RIGHT
 from tkinter.filedialog import askopenfilename
 
@@ -13,12 +13,14 @@ from ..app_globals import get_file_loaded, get_file_path, set_file_path, TSP_FIL
 from ..file_utils import handle_file_drop
 
 class Frame_Load (WindowAppTools):
+    __app_root: Tk = None
     parent: Misc = None
     root: Frame = None
 
     __input_labels: list[StringVar] = []
 
-    def __init__ (self, parent: Misc, win_width: int, win_height: int):
+    def __init__ (self, app_root: Tk, parent: Misc, win_width: int, win_height: int):
+        self.__app_root = app_root
         self.parent = parent
         self.root = Frame(self.parent)
 

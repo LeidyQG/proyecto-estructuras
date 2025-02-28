@@ -1,12 +1,18 @@
 
-from tkinter import Frame, Button, Label, LabelFrame, PhotoImage, Misc
+from tkinter import Frame, Button, Label, LabelFrame, PhotoImage, Tk, Misc
 from tkinter import N, NW, NE, E, W, S, X, CENTER, BOTH, NONE, LEFT, RIGHT
 
 from .custom_widgets import WindowAppTools, create_title
 
 class Frame_Results (WindowAppTools):
-    def __init__ (self, parent: Misc, win_width: int, win_height: int):
-        self.root = Frame(parent)
+    __app_root: Tk = None
+    parent: Misc = None
+    root: Frame = None
+
+    def __init__ (self, app_root: Tk, parent: Misc, win_width: int, win_height: int):
+        self.__app_root = app_root
+        self.parent = parent
+        self.root = Frame(self.parent)
 
         self._win_width = win_width
         self._win_height = win_height

@@ -10,10 +10,12 @@ TSP_FILE_TYPE = ".tsp"
 """ General States of the program """
 global file_loaded # File has been loaded, ready to process it
 global file_previewed # File has been loaded, not yet processed but preview available
+global file_processing # File is beeing processed
 global file_processed # File has been processed, ready to graph it
 global file_graphed # File has been graphed. 
 file_loaded: bool = False
 file_previewed: bool = False
+file_processing: bool = False
 file_processed: bool = False
 file_graphed: bool = False
 
@@ -27,6 +29,7 @@ def set_file_loaded (status:bool=True, parent:Misc=None) -> bool:
 
     if file_loaded:
         set_file_previewed(False)
+        set_file_processing(False)
         set_file_processed(False)
         set_file_graphed(False)
 
@@ -42,7 +45,25 @@ def set_file_previewed (status:bool=True, parent:Misc=None) -> bool:
 
     return True
 
-def get_file_graphed () -> bool: return file_graphed
+def get_file_processing () -> bool: return file_processing
+def set_file_processing (val:bool=True, parent:Misc=None) -> bool:
+    global file_processing
+
+    if not get_file_loaded() or not get_file_previewed():
+        file_graphed = False
+        return False
+
+    file_processing = val
+
+    if file_processing:
+        set_file_processed(False)
+
+    if parent != None:
+        parent.event_generate("<<CheckLoading>>")
+
+    return True
+
+def get_file_processed () -> bool: return file_processed
 def set_file_processed (val:bool=True, parent:Misc=None) -> bool:
     global file_processed
 
@@ -53,14 +74,16 @@ def set_file_processed (val:bool=True, parent:Misc=None) -> bool:
     file_processed = val
 
     if file_processed:
-        set_file_graphed(False)
+        set_file_processing(False, parent=parent)
+
+    set_file_graphed(False)
 
     if parent != None:
         parent.event_generate("<<CheckStep>>")
 
     return True
 
-def get_file_processed () -> bool: return file_processed
+def get_file_graphed () -> bool: return file_graphed
 def set_file_graphed (val:bool=True, parent:Misc=None) -> bool:
     global file_graphed
 

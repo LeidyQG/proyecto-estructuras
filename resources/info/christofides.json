@@ -1,0 +1,7 @@
+{
+    "title":"Algoritmo de Christofides",
+    "info":"El algoritmo de Christofides es una aproximación clásica para resolver el TSP. Combina un Árbol de Expansión Mínima (MST) con un emparejamiento perfecto de peso mínimo para construir un circuito euleriano, que luego se convierte en un circuito hamiltoniano.",
+    "complexity":"O(n^3)",
+    "memory":"Alta",
+    "quality":"Aproximación 1.5x óptima"
+}

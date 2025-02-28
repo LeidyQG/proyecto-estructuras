@@ -1,0 +1,7 @@
+{
+    "title":"Algoritmo de Cálculo de Matriz de Distancias en Paralelo (C++ y Python)",
+    "info":"Este algoritmo utiliza una implementación en C++ para calcular la matriz de distancias entre ciudades en paralelo, lo que mejora significativamente el rendimiento en comparación con una implementación secuencial. Luego, utiliza un enfoque basado en el Árbol de Expansión Mínima (MST) para aproximar una solución al TSP.",
+    "complexity":"O(n^2) en paralelo",
+    "memory":"Media",
+    "quality":"Depende del enfoque posterior (MST)"
+}

@@ -1,0 +1,7 @@
+{
+    "title":"Algoritmo Híbrido: Vecino Más Cercano + 2-opt",
+    "info":"Este algoritmo combina la heurística del vecino más cercano para generar una solución inicial y luego aplica el algoritmo 2-opt para optimizar el recorrido.",
+    "complexity":"O(n^2) + O(n^2)",
+    "memory":"Media",
+    "quality":"Mejor que vecino más cercano, peor que Christofides"
+}

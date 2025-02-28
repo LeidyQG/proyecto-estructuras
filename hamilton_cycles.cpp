@@ -1,79 +1,101 @@
 #include <iostream>
 #include <vector>
+#include <fstream>
+#include <sstream>
+#include <cmath>
 #include <limits>
 
 using namespace std;
 
-const int INF = numeric_limits<int>::max() / 2; // Prevent overflow
+const int INF = numeric_limits<int>::max() / 2;
 
-// FSA
-int countHamiltonianCycles(int n, vector<vector<int>> &graph) {
-    vector<vector<int>> dp(1 << n, vector<int>(n, 0));
-    dp[1][0] = 1;  // Start in 0
-    
-    for (int mask = 1; mask < (1 << n); ++mask) {
-        for (int u = 0; u < n; ++u) {
-            if (!(mask & (1 << u))) continue;  // Skip
-            for (int v = 0; v < n; ++v) {
-                if ((mask & (1 << v)) || graph[u][v] == INF) continue;
-                dp[mask | (1 << v)][v] += dp[mask][u];
+struct Point {
+    double x, y;
+};
+
+vector<vector<int>> parseTSPLibToAdjMatrix(const string &filename) {
+    ifstream file(filename);
+    if (!file) {
+        cerr << "Error opening file!" << endl;
+        exit(EXIT_FAILURE);
+    }
+
+    string line;
+    int dimension = 0;
+    vector<vector<int>> matrix;
+    vector<Point> points;
+    bool readingCoords = false, readingWeights = false;
+    int row = 0, col = 0;
+
+    while (getline(file, line)) {
+        if (line.find("DIMENSION") != string::npos) {
+            stringstream ss(line);
+            string temp;
+            ss >> temp >> temp >> dimension;
+            matrix.assign(dimension, vector<int>(dimension, INF));
+        } else if (line.find("EDGE_WEIGHT_SECTION") != string::npos) {
+            readingWeights = true;
+            row = 0;
+            col = 0;
+            continue;
+        } else if (line.find("NODE_COORD_SECTION") != string::npos) {
+            readingCoords = true;
+            continue;
+        } else if (line.find("EOF") != string::npos) {
+            break;
+        }
+
+        if (readingWeights) {
+            stringstream ss(line);
+            int weight;
+            while (ss >> weight) {
+                if (row < dimension && col < dimension) {
+                    matrix[row][col] = (weight == 0 ? INF : weight);
+                    matrix[col][row] = matrix[row][col]; // Symmetric TSP
+                    col++;
+                    if (col == dimension) {
+                        col = 0;
+                        row++;
+                    }
+                }
+            }
+            if (row >= dimension) break;
+        } else if (readingCoords) {
+            stringstream ss(line);
+            int index;
+            double x, y;
+            ss >> index >> x >> y;
+            points.push_back({x, y});
+        }
+    }
+    file.close();
+
+    if (!points.empty()) {
+        // Compute Euclidean distances
+        for (int i = 0; i < dimension; i++) {
+            for (int j = 0; j < dimension; j++) {
+                if (i != j) {
+                    double dx = points[i].x - points[j].x;
+                    double dy = points[i].y - points[j].y;
+                    matrix[i][j] = round(sqrt(dx * dx + dy * dy));
+                }
             }
         }
     }
-    
-    int cycleCount = 0;
-    for (int u = 1; u < n; ++u) {
-        if (graph[u][0] != INF) {
-            cycleCount += max(0, dp[(1 << n) - 1][u]);  // Ensure non-negative count
-        }
-    }
-    return cycleCount;
-}
 
-// Proper TSP algorithm
-int shortestHamiltonianCycle(int n, vector<vector<int>> &graph) {
-    vector<vector<int>> dp(1 << n, vector<int>(n, INF));
-    dp[1][0] = 0;
-    
-    for (int mask = 1; mask < (1 << n); ++mask) {
-        for (int u = 0; u < n; ++u) {
-            if (!(mask & (1 << u))) continue;
-            for (int v = 0; v < n; ++v) {
-                if ((mask & (1 << v)) || graph[u][v] == INF) continue;
-                dp[mask | (1 << v)][v] = min(dp[mask | (1 << v)][v], dp[mask][u] + graph[u][v]);
-            }
-        }
-    }
-    
-    int minCycle = INF;
-    for (int u = 1; u < n; ++u) {
-        if (graph[u][0] != INF) {
-            minCycle = min(minCycle, dp[(1 << n) - 1][u] + graph[u][0]);
-        }
-    }
-    return (minCycle >= INF) ? -1 : minCycle; // Ensure
+    return matrix;
 }
 
 int main() {
-    int n;
-    cout << "Enter number of cities: ";
-    cin >> n;
+    string filename = "ulysses16.tsp"; // Change as needed
+    vector<vector<int>> adjacencyMatrix = parseTSPLibToAdjMatrix(filename);
     
-    vector<vector<int>> graph(n, vector<int>(n, INF));
-    cout << "Enter adjacency matrix (use INF for no path):" << endl;
-    
-    for (int i = 0; i < n; ++i) {
-        for (int j = 0; j < n; ++j) {
-            cin >> graph[i][j];
-            if (i == j) graph[i][j] = INF; // No self-loops
+    cout << "Adjacency Matrix:" << endl;
+    for (const auto &row : adjacencyMatrix) {
+        for (int val : row) {
+            cout << (val == INF ? "INF" : to_string(val)) << " ";
         }
+        cout << endl;
     }
-    
-    int hamiltonianCycles = countHamiltonianCycles(n, graph);
-    int shortestCycle = shortestHamiltonianCycle(n, graph);
-    
-    cout << "Total Hamiltonian Cycles: " << hamiltonianCycles << endl;
-    cout << "Shortest Hamiltonian Cycle Length: " << shortestCycle << endl;
-    
     return 0;
 }

@@ -2,11 +2,16 @@
 #include <vector>
 #include <fstream>
 #include <sstream>
+#include <cmath>
 #include <limits>
 
 using namespace std;
 
 const int INF = numeric_limits<int>::max() / 2;
+
+struct Point {
+    double x, y;
+};
 
 vector<vector<int>> parseTSPLibToAdjMatrix(const string &filename) {
     ifstream file(filename);
@@ -18,7 +23,8 @@ vector<vector<int>> parseTSPLibToAdjMatrix(const string &filename) {
     string line;
     int dimension = 0;
     vector<vector<int>> matrix;
-    bool readingWeights = false;
+    vector<Point> points;
+    bool readingCoords = false, readingWeights = false;
     int row = 0, col = 0;
 
     while (getline(file, line)) {
@@ -32,7 +38,14 @@ vector<vector<int>> parseTSPLibToAdjMatrix(const string &filename) {
             row = 0;
             col = 0;
             continue;
-        } else if (readingWeights) {
+        } else if (line.find("NODE_COORD_SECTION") != string::npos) {
+            readingCoords = true;
+            continue;
+        } else if (line.find("EOF") != string::npos) {
+            break;
+        }
+
+        if (readingWeights) {
             stringstream ss(line);
             int weight;
             while (ss >> weight) {
@@ -46,15 +59,35 @@ vector<vector<int>> parseTSPLibToAdjMatrix(const string &filename) {
                     }
                 }
             }
-            if (row >= dimension) break; // Stop reading if all data is processed
+            if (row >= dimension) break;
+        } else if (readingCoords) {
+            stringstream ss(line);
+            int index;
+            double x, y;
+            ss >> index >> x >> y;
+            points.push_back({x, y});
         }
     }
     file.close();
+
+    if (!points.empty()) {
+        // Compute Euclidean distances
+        for (int i = 0; i < dimension; i++) {
+            for (int j = 0; j < dimension; j++) {
+                if (i != j) {
+                    double dx = points[i].x - points[j].x;
+                    double dy = points[i].y - points[j].y;
+                    matrix[i][j] = round(sqrt(dx * dx + dy * dy));
+                }
+            }
+        }
+    }
+
     return matrix;
 }
 
 int main() {
-    string filename = "ulysses22.opt.tour"; // Change this as needed
+    string filename = "ulysses22.tsp"; // Change as needed
     vector<vector<int>> adjacencyMatrix = parseTSPLibToAdjMatrix(filename);
     
     cout << "Adjacency Matrix:" << endl;

@@ -1,0 +1,7 @@
+{
+    "title":"Algoritmo del Vecino Más Cercano con Delta",
+    "info":"Este algoritmo utiliza la heurística del vecino más cercano para construir un recorrido inicial y luego calcula el delta (diferencia entre la arista más larga y la más corta) como métrica de calidad.",
+    "complexity":"O(n^2)",
+    "memory":"Baja",
+    "quality":"Heurística rápida, no garantiza óptimo"
+}
