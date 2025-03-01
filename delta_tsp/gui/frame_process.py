@@ -58,17 +58,17 @@ class Frame_Process (WindowAppTools):
             anchor=W
         )
 
-        help_btn_img = self._get_icon("help-about.png", big=True)
-        help_btn = Button(
-            header_wrapper,
-            image=help_btn_img,
-        )
-        help_btn.image = help_btn_img
-        help_btn.config(image=help_btn_img)
-        help_btn.pack(
-            side=RIGHT,
-            anchor=W
-        )
+        # help_btn_img = self._get_icon("help-about.png", big=True)
+        # help_btn = Button(
+            # header_wrapper,
+            # image=help_btn_img,
+        # )
+        # help_btn.image = help_btn_img
+        # help_btn.config(image=help_btn_img)
+        # help_btn.pack(
+            # side=RIGHT,
+            # anchor=W
+        # )
         
         header_wrapper.pack(anchor=N,expand=False,fill=X)
         return
@@ -155,9 +155,8 @@ class Frame_Process (WindowAppTools):
         set_file_processing(True, self.parent)
 
         algorithm_data = ALGORITHMS_LIST[algorithm_uid]
-        print(algorithm_data)
         
-        process_thread = threading.Thread(target=test_time, args=[self.parent])
+        process_thread = threading.Thread(target=algorithm_data["function"], args=(self.parent,))
         process_thread.start()
         return
 

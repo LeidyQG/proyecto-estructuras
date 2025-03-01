@@ -6,17 +6,20 @@ from tkinter import Misc
 """ File Constants """
 
 TSP_FILE_TYPE = ".tsp"
+TSP_FIlE_HEADER_END = "NODE_COORD_SECTION\n"
 
 """ General States of the program """
 global file_loaded # File has been loaded, ready to process it
 global file_previewed # File has been loaded, not yet processed but preview available
 global file_processing # File is beeing processed
 global file_processed # File has been processed, ready to graph it
+global file_results # File has been processed 
 global file_graphed # File has been graphed. 
 file_loaded: bool = False
 file_previewed: bool = False
 file_processing: bool = False
 file_processed: bool = False
+file_results: dict[str, any] = None
 file_graphed: bool = False
 
 global file_path # File Path
@@ -79,6 +82,20 @@ def set_file_processed (val:bool=True, parent:Misc=None) -> bool:
     set_file_graphed(False)
 
     if parent != None:
+        parent.event_generate("<<CheckStep>>")
+
+    return True
+
+def get_file_results () -> dict[str, any]: return file_results
+def set_file_results (val:dict[str, any], parent:Misc=None) -> bool:
+    global file_results
+
+    if not get_file_processed():
+        return False
+
+    file_results = val
+
+    if (parent != None):
         parent.event_generate("<<CheckStep>>")
 
     return True

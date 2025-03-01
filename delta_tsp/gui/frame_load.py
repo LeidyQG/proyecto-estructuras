@@ -1,5 +1,6 @@
 
 import pathlib
+import webbrowser
 
 from tkinter import Frame, Button, Label, LabelFrame, PhotoImage, StringVar, Tk, Misc
 from tkinter import N, NW, NE, E, W, S, X, CENTER, BOTH, NONE, LEFT, RIGHT
@@ -18,6 +19,9 @@ class Frame_Load (WindowAppTools):
     root: Frame = None
 
     __input_labels: list[StringVar] = []
+    file_input_label_1: Label = None
+    file_input_label_2: Label = None
+    file_input_btn: Button = None
 
     def __init__ (self, app_root: Tk, parent: Misc, win_width: int, win_height: int):
         self.__app_root = app_root
@@ -56,17 +60,17 @@ class Frame_Load (WindowAppTools):
             anchor=W
         )
 
-        help_btn_img = self._get_icon("help-about.png", big=True)
-        help_btn = Button(
-            header_wrapper,
-            image=help_btn_img
-        )
-        help_btn.image = help_btn_img
-        help_btn.config(image=help_btn_img)
-        help_btn.pack(
-            side=RIGHT,
-            anchor=W
-        )
+        # help_btn_img = self._get_icon("help-about.png", big=True)
+        # help_btn = Button(
+            # header_wrapper,
+            # image=help_btn_img
+        # )
+        # help_btn.image = help_btn_img
+        # help_btn.config(image=help_btn_img)
+        # help_btn.pack(
+            # side=RIGHT,
+            # anchor=W
+        # )
         
         header_wrapper.pack(anchor=N,expand=False,fill=X)
         return
@@ -83,26 +87,28 @@ class Frame_Load (WindowAppTools):
         
         file_input_btn_img = self._get_icon("find.png")
         self.set_input_label()
-        file_input_label_1 = Label(
+        self.file_input_label_1 = Label(
             file_label_wrapper,
-            textvariable=self.__input_labels[0]
+            textvariable=self.__input_labels[0],
+            font=("", 14, "bold")
         )
-        file_input_label_2 = Label(
+        self.file_input_label_2 = Label(
             file_label_wrapper,
-            textvariable=self.__input_labels[1]
+            textvariable=self.__input_labels[1],
+            font=("", 0, "normal")
         )
-        file_input_btn = Button(
+        self.file_input_btn = Button(
             file_label_wrapper,
             text="Find File",
             compound=LEFT,
             command=self.__open_file_dialog
         )
-        file_input_btn.image = file_input_btn_img
-        file_input_btn.config(image=file_input_btn_img)
+        self.file_input_btn.image = file_input_btn_img
+        self.file_input_btn.config(image=file_input_btn_img)
 
-        file_input_label_1.pack()
-        file_input_label_2.pack()
-        file_input_btn.pack()
+        self.file_input_label_1.pack()
+        # self.file_input_label_2.pack()
+        self.file_input_btn.pack()
 
         file_label_wrapper.pack(anchor=CENTER, expand=True)
 
@@ -127,7 +133,7 @@ class Frame_Load (WindowAppTools):
             text="Download TSP Files",
             image=download_files_btn_img,
             compound=LEFT,
-            command=lambda: print(get_file_loaded())
+            command=lambda: webbrowser.open_new("http://comopt.ifi.uni-heidelberg.de/software/TSPLIB95/tsp/")
         )
         # God I hate Tk
         download_files_btn.image = download_files_btn_img
@@ -151,7 +157,7 @@ class Frame_Load (WindowAppTools):
             filetypes=(("TST Instance file", TSP_FILE_TYPE),)
         )
 
-        if file_name == "":
+        if not file_name:
             return
 
         file_path = pathlib.Path(file_name)
@@ -172,6 +178,9 @@ class Frame_Load (WindowAppTools):
             file_loaded_name = get_file_path().stem + get_file_path().suffix
             self.__input_labels[0].set(f"Loaded '{file_loaded_name}'")
             self.__input_labels[1].set("need to use other file? Drag and Drop the file or")
+            self.file_input_btn.pack_forget()
+            self.file_input_label_2.pack()
+            self.file_input_btn.pack()
         else:
             self.__input_labels[0].set("Drag and Drop Your TSP instance File Here \nor")
             self.__input_labels[1].set("")

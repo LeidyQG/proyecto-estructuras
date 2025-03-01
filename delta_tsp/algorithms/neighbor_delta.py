@@ -1,6 +1,9 @@
+import time
+
 import numpy as np
 from scipy.spatial import distance_matrix
-import time
+
+from ..app_globals import get_file_path, set_file_results, set_file_processed
 
 def leer_instancia_tsp(archivo):
     with open(archivo, 'r') as f:
@@ -43,16 +46,26 @@ def delta_tsp_vecino_mas_cercano(coordenadas):
     
     return ruta, delta
 
-def main(archivo_tsp):
+def neighbor_delta_algorithm (parent):
+    archivo_tsp = str(get_file_path())
+
     coordenadas = leer_instancia_tsp(archivo_tsp)
     inicio = time.time()
     ruta, delta = delta_tsp_vecino_mas_cercano(coordenadas)
     fin = time.time()
-    
-    print(f"Ruta encontrada: {ruta}")
-    print(f"Delta (diferencia entre arista más larga y más corta): {delta}")
-    print(f"Tiempo de ejecución: {fin - inicio:.4f} segundos")
+ 
+    set_file_processed(True, parent)
+    set_file_results({
+        "distance": delta,
+        "nodes": len(coordenadas),
+        "route": ruta,
+        "time": fin - inicio
+    }, parent)
+
+    # print(f"Ruta encontrada: {ruta}")
+    # print(f"Delta (diferencia entre arista más larga y más corta): {delta}")
+    # print(f"Tiempo de ejecución: {fin - inicio:.4f} segundos")
 
 if __name__ == "__main__":
-    archivo_tsp = "pla33810.tsp"
+    archivo_tsp = "ulysses22.tsp"
     main(archivo_tsp)

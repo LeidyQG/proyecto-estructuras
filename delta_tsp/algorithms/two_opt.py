@@ -1,8 +1,13 @@
-import numpy as np
-from scipy.spatial import distance_matrix
 import time
 
-def leer_instancia_tsp(archivo):
+import numpy as np
+from scipy.spatial import distance_matrix
+
+from tkinter import Misc
+
+from ..app_globals import set_file_processed, set_file_results, get_file_path
+
+def read_tsp_file (archivo):
     with open(archivo, 'r') as f:
         lineas = f.readlines()
     
@@ -21,7 +26,7 @@ def leer_instancia_tsp(archivo):
     
     return np.array(coordenadas)
 
-def vecino_mas_cercano(coordenadas, distancias):
+def get_nearest_neighbor (coordenadas, distancias):
     n = len(coordenadas)
     visitado = np.zeros(n, dtype=bool)
     ruta = [0]  # Empezar en la primera ciudad
@@ -36,17 +41,17 @@ def vecino_mas_cercano(coordenadas, distancias):
     
     return ruta
 
-def calcular_distancia_total(ruta, distancias):
+def calc_total_distance (ruta, distancias):
     return sum(distancias[ruta[i], ruta[i+1]] for i in range(len(ruta)-1)) + distancias[ruta[-1], ruta[0]]
 
-def two_opt(ruta, distancias, max_iteraciones=100):
+def two_opt (ruta, distancias, max_iteraciones=100):
     mejor_ruta = ruta
-    mejor_distancia = calcular_distancia_total(mejor_ruta, distancias)
+    mejor_distancia = calc_total_distance(mejor_ruta, distancias)
     
     for _ in range(max_iteraciones):
         mejora = False
         for i in range(1, len(ruta) - 2):
-            for j in range(i + 1, len(ruta)):
+            for j in range(i + 1, len(ruta) - 1):
                 if j - i == 1:
                     continue
                 
@@ -66,24 +71,24 @@ def two_opt(ruta, distancias, max_iteraciones=100):
     
     return mejor_ruta
 
-def main(archivo_tsp):
-    coordenadas = leer_instancia_tsp(archivo_tsp)
-    distancias = distance_matrix(coordenadas, coordenadas)
-    
-    # Paso 1: Generar solución inicial con Vecino más cercano
-    inicio = time.time()
-    ruta_inicial = vecino_mas_cercano(coordenadas, distancias)
-    distancia_inicial = calcular_distancia_total(ruta_inicial, distancias)
-    print(f"Distancia inicial (Vecino más cercano): {distancia_inicial}")
-    print(f"Tiempo Vecino más cercano: {time.time() - inicio:.4f} segundos")
-    
-    # Paso 2: Mejorar la solución con 2-opt
-    inicio = time.time()
-    ruta_optimizada = two_opt(ruta_inicial, distancias)
-    distancia_optimizada = calcular_distancia_total(ruta_optimizada, distancias)
-    print(f"Distancia optimizada (2-opt): {distancia_optimizada}")
-    print(f"Tiempo 2-opt: {time.time() - inicio:.4f} segundos")
+def two_opt_algorithm (parent: Misc) -> None:
+    file_path = str(get_file_path())
 
-if __name__ == "__main__":
-    archivo_tsp = "pla33810.tsp"  # Cambia esto por el nombre de tu archivo .tsp
-    main(archivo_tsp)
+    start_time = time.time()
+    coordinates_array = read_tsp_file(file_path)
+    distances_array = distance_matrix(coordinates_array, coordinates_array)
+
+    starting_route = get_nearest_neighbor(coordinates_array, distances_array)
+    starting_distance = calc_total_distance(starting_route, distances_array)
+
+    optimal_route = two_opt(starting_route, distances_array)
+    optimal_distance = calc_total_distance(optimal_route, distances_array)
+
+    set_file_processed(True, parent)
+    set_file_results({
+        "distance": optimal_distance,
+        "time": time.time() - start_time,
+        "route": optimal_route,
+        "nodes": len(coordinates_array)
+    }, parent)
+

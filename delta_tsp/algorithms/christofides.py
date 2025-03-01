@@ -1,19 +1,32 @@
+
 import numpy as np
 import networkx as nx
 from scipy.spatial import distance_matrix
 
-def load_tsp_instance(file_path):
-    with open(file_path, 'r') as file:
-        lines = file.readlines()
-    # Extraer las coordenadas
-    coordinates = []    
-    for line in lines[6:]: 
-        # Ignorar las primeras 6 líneas
-        parts = line.split()
-        if len(parts) >= 3:
-            x, y = float(parts[1]), float(parts[2])
-            coordinates.append((x, y))
-    return np.array(coordinates)
+from tkinter import Misc
+
+from ..app_globals import get_file_path, set_file_processed, set_file_results
+
+# from ..app_globals import get_file_path, set_file_processed
+
+def load_tsp_instance(file_path: str) -> np.array:
+    with open(file_path, 'r') as f:
+        lineas = f.readlines()
+    
+    coordenadas = []
+    leer_coordenadas = False
+    for linea in lineas:
+        if linea.startswith("NODE_COORD_SECTION"):
+            leer_coordenadas = True
+            continue
+        if linea.startswith("EOF"):
+            break
+        if leer_coordenadas:
+            partes = linea.strip().split()
+            if len(partes) == 3:
+                coordenadas.append((float(partes[1]), float(partes[2])))
+
+    return np.array(coordenadas)
 
 def calculate_distance_matrix(coordinates):
     # Calcular la matriz de distancias entre las coordenadas
@@ -45,7 +58,7 @@ def eulerian_circuit(graph, start):
     tour = list(nx.eulerian_circuit(G, source=start))
     return [u for u, v in tour] + [tour[0][1]]  # Regresar al inicio
 
-def christofides_algorithm(graph):
+def christofides (graph):
     # Paso 1: Crear un árbol de expansión mínima (MST)
     mst = minimum_spanning_tree(graph)
     # Paso 2: Encontrar los vértices de grado impar
@@ -80,11 +93,21 @@ def christofides_algorithm(graph):
     
     return hamiltonian_circuit
 
+def christofides_algorithm (parent: Misc) -> None:
+    file_path: str = str(get_file_path())
+
+    coordinates_array: np.array = load_tsp_instance(file_path)
+    distance_matrix = calculate_distance_matrix(coordinates_array)
+    tour = christofides(distance_matrix)
+
+    set_file_processed(True, parent=parent)
+
+
 # Ejecución principal
 if __name__ == "__main__":
     # Cargar la instancia pla85900
-    coordinates = load_tsp_instance("./ulysses22.tsp")
+    coordinates = load_tsp_instance('../../ulysses22-2.tsp')
     distance_matrix = calculate_distance_matrix(coordinates)
     # Ejecutar el algoritmo de Christofides
-    tour = christofides_algorithm(distance_matrix)
+    tour = christofides(distance_matrix)
     print("Tour encontrado:", tour)

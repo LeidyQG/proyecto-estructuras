@@ -82,7 +82,7 @@ class GUI (WindowAppTools):
         )
         self.main_frame.pack(
             anchor=CENTER,
-            padx=self._get_win_percentage(8),
+            padx=self._get_win_percentage(5),
             pady=self._get_win_percentage(2),
             fill=BOTH,
             expand=True
@@ -129,7 +129,7 @@ class GUI (WindowAppTools):
             text="Results",
             state=DISABLED
         )
-        self.nbook.add(fothers, text="Info")
+        # self.nbook.add(fothers, text="Info")
 
         self.fload.start()
         self.fprocess.start()
@@ -146,28 +146,29 @@ class GUI (WindowAppTools):
         return
 
     def update_tabs (self, event: Event) -> None:
+        tab_to_select = 0
+
         if get_file_loaded():
             self.nbook.tab(1, state=NORMAL)
-            self.nbook.select(1)
+            tab_to_select = 1
 
             self.fload.set_input_label(loaded=True)
-            return
         else:
             self.nbook.tab(1, state=DISABLED)
-            return
 
         if get_file_loaded() and get_file_processed():
             self.nbook.tab(2, state=NORMAL)
-            self.nbook.select(2)
-            return
+            tab_to_select = 2
+
+            self.fresults.make_graph()
         else:
             self.nbook.tab(2, state=DISABLED)
-            return
 
+        self.nbook.select(tab_to_select)
         return
 
     def update_loader (self, event: Event) -> None:
-        print(get_file_processing(), get_file_processed(), self.__loading_img_running)
+        # print(get_file_processing(), get_file_processed(), self.__loading_img_running)
         if get_file_processing() and not get_file_processed():
             self.loading_frame.place(
                 x=self._get_win_percentage(50) - (LOADING_WIDGET_SIZE // 2),
@@ -178,7 +179,7 @@ class GUI (WindowAppTools):
         else:
             self.__loading_img_running = False
             self.loading_frame.place_forget()
-        print(get_file_processing(), get_file_processed(), self.__loading_img_running)
+        # print(get_file_processing(), get_file_processed(), self.__loading_img_running)
 
         return
 
